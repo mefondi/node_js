@@ -1,15 +1,9 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { validationResult } from 'express-validator';
 
 import userModel from '../models/user.js';
 
 export const register =  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
     try {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(req.body.password, salt);
@@ -40,12 +34,6 @@ export const register =  async (req, res) => {
 
 export const login = async (req, res) => {
     try {
-        const user = await userModel.findOne({email: req.body.email})
-
-        if (!user) {
-            return res.status(400).json({massage: 'User not found'})
-        }
-
         const isValPassword = await bcrypt.compare(req.body.password, user.password)
 
         if (!isValPassword) {
